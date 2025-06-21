@@ -40,10 +40,15 @@ export async function handleReceiptUpload(file) {
   ]);
 
   const response = await result.response;
-  const text = response.text();
-  console.log('api called');
+const text = response.text();
+console.log('api called');
 
-  fs.unlinkSync(imagePath); // Delete temp file
+fs.unlinkSync(imagePath);
 
-  return text;
+  const parsed = JSON.parse(text);
+  
+  parsed.date = new Date();
+
+  return parsed;
+
 }

@@ -37,7 +37,7 @@ mongoose.connect('mongodb+srv://jamie:able2332@receiptme.jrijp23.mongodb.net/?re
 const receiptSchema = new mongoose.Schema({
   receiptId: String,
   vendor: String,
-  date: String,
+  date: {type: Date},
   items: [{
     itemId: String,
     name: String,
@@ -65,7 +65,12 @@ app.post('/upload', upload.single('receipt'), async (req, res) => {
 
 app.get('/spending-summary', async (req, res) => {
   try {
-    const receipts = await Receipt.find();
+    const thirtyDaysAgo = new Date();
+    
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const receipts = await Receipt.find({ date: { $gte: thirtyDaysAgo } });
+
 
     const categoryTotals = {};
 
