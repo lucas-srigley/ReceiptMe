@@ -17,7 +17,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg"></div>
-            <span className="font-bold text-xl text-gray-800">ReceiptRadar</span>
+            <span className="font-bold text-xl text-gray-800">ReceiptMe</span>
           </div>
           
           <div className="flex space-x-6">
