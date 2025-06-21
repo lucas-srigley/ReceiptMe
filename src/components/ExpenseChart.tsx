@@ -30,7 +30,7 @@ const ExpenseChart = () => {
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(value) => [`$${value.toFixed(2)}`, 'Amount']} />
+            <Tooltip formatter={(value: number) => [`$${value.toFixed(2)}`, 'Amount']} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
