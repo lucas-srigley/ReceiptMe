@@ -109,6 +109,104 @@ app.get('/api/receipts', async (req, res) => {
   }
 });
 
+app.post('/api/expenses', async (req, res) => {
+  console.log('Incoming expense:', req.body);
+  try {
+    const { vendor, items } = req.body;
+
+    if (!vendor || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Invalid expense data' });
+    }
+
+    const receiptId = Math.floor(Math.random() * 1e9).toString(); // generate random receipt ID
+
+    const receipt = new Receipt({
+      receiptId,
+      vendor,
+      date: new Date(),
+      items: items.map((item, index) => ({
+        itemId: Math.floor(Math.random() * 1e9).toString(),
+        name: item.description || 'Unknown',
+        category: item.category || 'Other',
+        price: parseFloat(item.amount) || 0,
+      })),
+    });
+
+    await receipt.save();
+
+    res.status(201).json({ success: true, message: 'Expense added', receipt });
+  } catch (err) {
+    console.error('Error saving manual expense:', err);
+    res.status(500).json({ error: 'Failed to save expense' });
+  }
+});
+
+app.get('/demographic-comparison', async (req, res) => {
+  try {
+    const scope = req.query.scope || 'global'; // 'global', 'country', 'city', 'age group'
+    const currentUserId = req.query.userId; // optionally passed from frontend
+
+    // Fetch current user's data (you may need user context)
+    const userReceipts = await Receipt.find({ userId: currentUserId, date: { $gte: lastMonth } });
+
+    // Aggregate all receipts matching the demographic scope
+    let filters = { date: { $gte: lastMonth } };
+
+    if (scope === 'country') {
+      filters.country = 'Canada'; // You'll need user profile info
+    } else if (scope === 'city') {
+      filters.city = 'Toronto';
+    } else if (scope === 'age group') {
+      filters.ageGroup = '18-25';
+    }
+
+    const allReceipts = await Receipt.find(filters);
+
+    // Calculate averages
+    const categoryTotals = {};
+    const categoryCounts = {};
+
+    allReceipts.forEach((r) => {
+      r.items.forEach((item) => {
+        if (!categoryTotals[item.category]) {
+          categoryTotals[item.category] = 0;
+          categoryCounts[item.category] = 0;
+        }
+        categoryTotals[item.category] += item.price;
+        categoryCounts[item.category]++;
+      });
+    });
+
+    const avgByCategory = {};
+    for (const cat in categoryTotals) {
+      avgByCategory[cat] = categoryTotals[cat] / categoryCounts[cat];
+    }
+
+    // Compare to current user's totals
+    const userCategoryTotals = {};
+    userReceipts.forEach((r) => {
+      r.items.forEach((item) => {
+        userCategoryTotals[item.category] = (userCategoryTotals[item.category] || 0) + item.price;
+      });
+    });
+
+    const comparison = Object.entries(avgByCategory).map(([category, avg]) => {
+      const userSpent = userCategoryTotals[category] || 0;
+      const difference = Math.round(((userSpent - avg) / avg) * 100);
+
+      return {
+        category,
+        difference,
+        isHigher: difference > 0
+      };
+    });
+
+    res.json(comparison);
+  } catch (err) {
+    console.error('Error generating demographic comparison:', err);
+    res.status(500).send('Error generating comparison');
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
