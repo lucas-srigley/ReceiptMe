@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
 const colorMap: Record<string, string> = {
-  'Food & Dining': 'bg-green-500',
+  'Groceries': 'bg-green-500',
+  'Dining & Takeout': 'bg-emerald-500',
   'Entertainment': 'bg-blue-500',
   'Shopping': 'bg-purple-500',
   'Transportation': 'bg-yellow-500',
+  'Housing': 'bg-orange-500',
+  'Health & Wellness': 'bg-pink-500',
   'Other': 'bg-gray-500',
 };
 
