@@ -12,7 +12,7 @@ export async function handleReceiptUpload(file) {
 
   const categories = 'Groceries, Dining and Takeout, Transportation, Housing/Rent, Travel,  Health & Wellness, Education, Clothes, Entertainment & Recreation, Charity & Giving, Miscellaneous';
 
-  const prompt = `Extract the receipt data and return it in this JSON format:
+  const prompt = `Extract the receipt data and return it as a JSON':
   {
     "receiptId": "",
     "vendor": "",
@@ -38,6 +38,7 @@ export async function handleReceiptUpload(file) {
       text: prompt,
     },
   ]);
+
 
   const response = await result.response;
   const text = response.text();
