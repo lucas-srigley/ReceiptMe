@@ -1,60 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface Receipt {
-  id: number;
+  _id: string;
+  receiptId: string;
   date: string;
-  total: number;
-  merchant: string;
-  items: { name: string; amount: number; category: string }[];
+  vendor: string;
+  items: {
+    itemId: string;
+    name: string;
+    category: string;
+    price: number;
+  }[];
 }
 
 const HistoryPage = () => {
-  const [receipts, setReceipts] = useState<Receipt[]>([
-    {
-      id: 1,
-      date: '2024-12-15',
-      total: 47.85,
-      merchant: 'Whole Foods Market',
-      items: [
-        { name: 'Organic Bananas', amount: 3.99, category: 'Food' },
-        { name: 'Greek Yogurt', amount: 5.49, category: 'Food' },
-        { name: 'Spinach', amount: 2.99, category: 'Food' },
-        { name: 'Chicken Breast', amount: 12.99, category: 'Food' },
-        { name: 'Olive Oil', amount: 8.99, category: 'Food' },
-        { name: 'Bread', amount: 3.49, category: 'Food' },
-        { name: 'Tomatoes', amount: 4.99, category: 'Food' },
-        { name: 'Cheese', amount: 4.92, category: 'Food' }
-      ]
-    },
-    {
-      id: 2,
-      date: '2024-12-14',
-      total: 24.50,
-      merchant: 'AMC Theaters',
-      items: [
-        { name: 'Movie Ticket', amount: 15.00, category: 'Entertainment' },
-        { name: 'Popcorn', amount: 7.50, category: 'Entertainment' },
-        { name: 'Soda', amount: 2.00, category: 'Entertainment' }
-      ]
-    },
-    {
-      id: 3,
-      date: '2024-12-13',
-      total: 89.99,
-      merchant: 'Target',
-      items: [
-        { name: 'Winter Jacket', amount: 59.99, category: 'Shopping' },
-        { name: 'Socks (3-pack)', amount: 12.99, category: 'Shopping' },
-        { name: 'Phone Charger', amount: 17.01, category: 'Shopping' }
-      ]
-    }
-  ]);
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const deleteReceipt = (id: number) => {
-    setReceipts(receipts.filter(receipt => receipt.id !== id));
+  useEffect(() => {
+    const fetchReceipts = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/api/receipts');
+        const data = await res.json();
+        setReceipts(data);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch receipts.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReceipts();
+  }, []);
+
+  const deleteReceipt = (id: string) => {
+    setReceipts(receipts.filter(receipt => receipt._id !== id));
   };
 
   return (
@@ -69,18 +54,18 @@ const HistoryPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {receipts.map((receipt) => (
-            <div key={receipt.id} className="bg-white rounded-xl shadow-lg p-6 relative hover:shadow-xl transition-shadow duration-200">
+            <div key={receipt._id} className="bg-white rounded-xl shadow-lg p-6 relative hover:shadow-xl transition-shadow duration-200">
               <button
-                onClick={() => deleteReceipt(receipt.id)}
+                onClick={() => deleteReceipt(receipt._id)}
                 className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200"
               >
                 <X size={20} />
               </button>
 
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">{receipt.merchant}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{receipt.vendor}</h3>
                 <p className="text-sm text-gray-500">{new Date(receipt.date).toLocaleDateString()}</p>
-                <p className="text-2xl font-bold text-green-600 mt-2">${receipt.total.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-600 mt-2">${receipt.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</p>
               </div>
 
               <div className="space-y-2">
@@ -89,7 +74,7 @@ const HistoryPage = () => {
                   {receipt.items.map((item, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-gray-600 truncate mr-2">{item.name}</span>
-                      <span className="text-gray-900 font-medium">${item.amount.toFixed(2)}</span>
+                      <span className="text-gray-900 font-medium">${item.price.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
