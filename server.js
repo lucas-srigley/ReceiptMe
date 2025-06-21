@@ -83,6 +83,16 @@ app.get('/spending-summary', async (req, res) => {
   }
 });
 
+app.get('/api/receipts', async (req, res) => {
+  try {
+    const receipts = await Receipt.find();
+    res.json(receipts);
+  } catch (err) {
+    console.error('Error fetching receipts:', err);
+    res.status(500).send('Error fetching receipts');
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
