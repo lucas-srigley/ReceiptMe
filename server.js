@@ -7,7 +7,18 @@ import { handleReceiptUpload } from './gemini.js';
 import mongoose from 'mongoose';
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({
+  dest: 'uploads/',
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Unsupported file type'), false);
+    }
+  },
+});
+
 const PORT = 3001;
 
 app.use(cors());
