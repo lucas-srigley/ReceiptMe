@@ -106,7 +106,7 @@ const ExpenseInput = () => {
           </Button>
         </div>
       </div>
-      {loading && <Spinner />}
+        {loading && <Spinner />}
     </div>
   );
 };
