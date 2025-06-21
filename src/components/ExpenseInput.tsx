@@ -7,6 +7,8 @@ const ExpenseInput = () => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [parsedReceipt, setParsedReceipt] = useState<string | null>(null);
 
   const handleManualEntry = () => {
     console.log('Manual entry:', { amount, category, description });
@@ -16,11 +18,33 @@ const ExpenseInput = () => {
     setDescription('');
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      console.log('Receipt uploaded:', file.name);
-      // Handle file upload logic
+    if (!file) return;
+
+    console.log('Uploading receipt:', file.name);
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append('receipt', file);
+
+    try {
+      const response = await fetch('http://localhost:3001/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const data = await response.json();
+      console.log('Parsed receipt:', data.parsed);
+      setParsedReceipt(data.parsed);
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Failed to upload receipt');
+    } finally {
+      setLoading(false);
     }
   };
 

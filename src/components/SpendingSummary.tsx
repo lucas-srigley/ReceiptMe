@@ -1,15 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+const colorMap: Record<string, string> = {
+  'Food & Dining': 'bg-green-500',
+  'Entertainment': 'bg-blue-500',
+  'Shopping': 'bg-purple-500',
+  'Transportation': 'bg-yellow-500',
+  'Other': 'bg-gray-500',
+};
+
+type Category = {
+  name: string;
+  amount: number;
+  percentage?: number;
+  color?: string;
+};
 
 const SpendingSummary = () => {
-  const categories = [
-    { name: 'Food & Dining', amount: 847.50, color: 'bg-green-500', percentage: 35 },
-    { name: 'Entertainment', amount: 234.75, color: 'bg-blue-500', percentage: 15 },
-    { name: 'Shopping', amount: 456.30, color: 'bg-purple-500', percentage: 25 },
-    { name: 'Transportation', amount: 189.25, color: 'bg-yellow-500', percentage: 12 },
-    { name: 'Other', amount: 312.20, color: 'bg-gray-500', percentage: 13 }
-  ];
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [totalSpent, setTotalSpent] = useState<number>(0);
 
-  const totalSpent = categories.reduce((sum, cat) => sum + cat.amount, 0);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/spending-summary');
+        const data: Category[] = await res.json();
+
+        const total = data.reduce((sum, c) => sum + c.amount, 0);
+        const enriched = data.map((c) => ({
+          ...c,
+          percentage: Math.round((c.amount / total) * 100),
+          color: colorMap[c.name] || 'bg-gray-400',
+        }));
+
+        setCategories(enriched);
+        setTotalSpent(total);
+      } catch (error) {
+        console.error('Failed to fetch summary:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
