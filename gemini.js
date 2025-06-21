@@ -30,7 +30,7 @@ export async function handleReceiptUpload(file) {
   const result = await model.generateContent([
     {
       inlineData: {
-        mimeType: 'image/jpeg',
+        mimeType: file.mimetype,
         data: imageData,
       },
     },
