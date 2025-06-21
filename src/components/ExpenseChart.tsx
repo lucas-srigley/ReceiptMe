@@ -11,6 +11,7 @@ import {
 type Category = {
   name: string;
   amount: number;
+  value?: number; // needed for recharts
   color?: string;
 };
 
@@ -24,6 +25,7 @@ const colorMap: Record<string, string> = {
 
 const ExpenseChart = () => {
   const [data, setData] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,11 +42,18 @@ const ExpenseChart = () => {
         setData(withColors);
       } catch (error) {
         console.error('Error fetching expense data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
+  // Gray placeholder if data is empty and not loading
+  const chartData = data.length > 0
+    ? data
+    : [{ name: 'No Data', value: 1, color: '#d1d5db' }]; // gray-300
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -54,7 +63,7 @@ const ExpenseChart = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={data}
+              data={chartData}
               cx="50%"
               cy="50%"
               outerRadius={100}
@@ -62,12 +71,16 @@ const ExpenseChart = () => {
               stroke="none"
               nameKey="name"
             >
-              {data.map((entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(value: number) => [`$${value.toFixed(2)}`, 'Amount']} />
-            <Legend />
+            {data.length > 0 && (
+              <>
+                <Tooltip formatter={(value: number) => [`$${value.toFixed(2)}`, 'Amount']} />
+                <Legend />
+              </>
+            )}
           </PieChart>
         </ResponsiveContainer>
       </div>
