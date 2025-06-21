@@ -8,7 +8,7 @@ export async function handleReceiptUpload(file) {
   const imagePath = path.resolve(file.path);
   const imageData = fs.readFileSync(imagePath, { encoding: 'base64' });
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flas' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const categories = 'Food & Dining, Entertainment, Shopping, Transportation, Other';
 
