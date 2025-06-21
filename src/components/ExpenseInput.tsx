@@ -3,6 +3,12 @@ import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+const Spinner = () => (
+    <div className="flex justify-center mt-4">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
+    </div>
+)
+
 const ExpenseInput = () => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
@@ -100,6 +106,7 @@ const ExpenseInput = () => {
           </Button>
         </div>
       </div>
+      {loading && <Spinner />}
     </div>
   );
 };
