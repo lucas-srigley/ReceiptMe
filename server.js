@@ -7,10 +7,15 @@ const app = express();
 const PORT = 3000;
 
 app.get('/', async (req, res) => {
-  await runGemini();
-  res.send('Gemini response logged to console');
+  try {
+    const geminiResponse = await runGemini();
+    res.send(`<h1>Gemini says:</h1><pre>${geminiResponse}</pre>`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error processing Gemini request.');
+  }
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
