@@ -45,7 +45,7 @@ console.log('api called');
 
 fs.unlinkSync(imagePath);
 
-  const parsed = JSON.parse(text);
+  const parsed = JSON.parse(text.replace(/^```json\n/, '').replace(/\n```$/, ''));
   
   parsed.date = new Date();
 

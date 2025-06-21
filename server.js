@@ -50,13 +50,12 @@ const Receipt = mongoose.model('Receipt', receiptSchema);
 
 app.post('/upload', upload.single('receipt'), async (req, res) => {
   try {
-    const parsedText = await handleReceiptUpload(req.file);
-    const receiptData = JSON.parse(parsedText.replace(/^```json\n/, '').replace(/\n```$/, ''));
 
+    const receiptData = await handleReceiptUpload(req.file);
     const receipt = new Receipt(receiptData);
     await receipt.save();
 
-    res.json({ parsed: parsedText, saved: true });
+    res.json({ parsed: receiptData, saved: true });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error processing receipt');
@@ -109,6 +108,72 @@ app.get('/api/receipts', async (req, res) => {
   }
 });
 
+app.get('/demographic-comparison', async (req, res) => {
+  try {
+    const scope = req.query.scope || 'global'; // 'global', 'country', 'city', 'age group'
+    const currentUserId = req.query.userId; // optionally passed from frontend
+
+    // Fetch current user's data (you may need user context)
+    const userReceipts = await Receipt.find({ userId: currentUserId, date: { $gte: lastMonth } });
+
+    // Aggregate all receipts matching the demographic scope
+    let filters = { date: { $gte: lastMonth } };
+
+    if (scope === 'country') {
+      filters.country = 'Canada'; // You'll need user profile info
+    } else if (scope === 'city') {
+      filters.city = 'Toronto';
+    } else if (scope === 'age group') {
+      filters.ageGroup = '18-25';
+    }
+
+    const allReceipts = await Receipt.find(filters);
+
+    // Calculate averages
+    const categoryTotals = {};
+    const categoryCounts = {};
+
+    allReceipts.forEach((r) => {
+      r.items.forEach((item) => {
+        if (!categoryTotals[item.category]) {
+          categoryTotals[item.category] = 0;
+          categoryCounts[item.category] = 0;
+        }
+        categoryTotals[item.category] += item.price;
+        categoryCounts[item.category]++;
+      });
+    });
+
+    const avgByCategory = {};
+    for (const cat in categoryTotals) {
+      avgByCategory[cat] = categoryTotals[cat] / categoryCounts[cat];
+    }
+
+    // Compare to current user's totals
+    const userCategoryTotals = {};
+    userReceipts.forEach((r) => {
+      r.items.forEach((item) => {
+        userCategoryTotals[item.category] = (userCategoryTotals[item.category] || 0) + item.price;
+      });
+    });
+
+    const comparison = Object.entries(avgByCategory).map(([category, avg]) => {
+      const userSpent = userCategoryTotals[category] || 0;
+      const difference = Math.round(((userSpent - avg) / avg) * 100);
+
+      return {
+        category,
+        difference,
+        isHigher: difference > 0
+      };
+    });
+
+    res.json(comparison);
+  } catch (err) {
+    console.error('Error generating demographic comparison:', err);
+    res.status(500).send('Error generating comparison');
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
