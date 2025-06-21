@@ -22,6 +22,7 @@ const upload = multer({
 const PORT = 3001;
 
 app.use(cors());
+app.use(express.json());
 
 // MongoDB Connection
 mongoose.connect('mongodb+srv://jamie:able2332@receiptme.jrijp23.mongodb.net/?retryWrites=true&w=majority&appName=receiptMe', {
@@ -109,6 +110,37 @@ app.get('/api/receipts', async (req, res) => {
   }
 });
 
+app.post('/api/expenses', async (req, res) => {
+  console.log('Incoming expense:', req.body);
+  try {
+    const { vendor, items } = req.body;
+
+    if (!vendor || !items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Invalid expense data' });
+    }
+
+    const receiptId = Math.floor(Math.random() * 1e9).toString(); // generate random receipt ID
+
+    const receipt = new Receipt({
+      receiptId,
+      vendor,
+      date: new Date(),
+      items: items.map((item, index) => ({
+        itemId: Math.floor(Math.random() * 1e9).toString(),
+        name: item.description || 'Unknown',
+        category: item.category || 'Other',
+        price: parseFloat(item.amount) || 0,
+      })),
+    });
+
+    await receipt.save();
+
+    res.status(201).json({ success: true, message: 'Expense added', receipt });
+  } catch (err) {
+    console.error('Error saving manual expense:', err);
+    res.status(500).json({ error: 'Failed to save expense' });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
