@@ -1,6 +1,8 @@
 import React from "react";
 import backgroundImage from "@/assets/background.png"; 
-import { GoogleLogin } from "@react-oauth/google"
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   return (
@@ -21,6 +23,7 @@ const LandingPage = () => {
             <GoogleLogin 
             onSuccess={(credentialResponse) => {
                 console.log(credentialResponse);
+                console.log(jwtDecode(credentialResponse.credential));
             }} 
             onError={ () => console.log("Login Failed")}/>
         </>
