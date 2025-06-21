@@ -138,7 +138,7 @@ const ProfilePage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Annual Income ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Annual Income ($ CAD)</label>
               <Input
                 type="number"
                 value={profile.income}
@@ -148,7 +148,7 @@ const ProfilePage = () => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Location (City, State)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Location (City, Province)</label>
               <Input
                 value={profile.location}
                 onChange={(e) => handleInputChange('location', e.target.value)}
