@@ -10,7 +10,7 @@ const LoginPage = () => {
           <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
             <span className="text-2xl font-bold text-white">RR</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">ReceiptRadar</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">ReceiptMe</h1>
           <p className="text-gray-600">Track your spending with AI insights</p>
         </div>
 
