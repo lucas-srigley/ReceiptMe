@@ -37,8 +37,6 @@ const receiptSchema = new mongoose.Schema({
 
 const Receipt = mongoose.model('Receipt', receiptSchema);
 
-
-
 app.post('/upload', upload.single('receipt'), async (req, res) => {
   try {
     const parsedText = await handleReceiptUpload(req.file);
@@ -53,6 +51,38 @@ app.post('/upload', upload.single('receipt'), async (req, res) => {
     res.status(500).send('Error processing receipt');
   }
 });
+
+app.get('/spending-summary', async (req, res) => {
+  try {
+    const receipts = await Receipt.find();
+
+    const categoryTotals = {};
+
+    receipts.forEach(receipt => {
+      receipt.items.forEach(item => {
+        const category = item.category || 'Other';
+        if (!categoryTotals[category]) {
+          categoryTotals[category] = 0;
+        }
+        categoryTotals[category] += item.price;
+      });
+    });
+
+    const totalSpent = Object.values(categoryTotals).reduce((sum, val) => sum + val, 0);
+
+    const summary = Object.entries(categoryTotals).map(([name, amount]) => ({
+      name,
+      amount,
+      percentage: Math.round((amount / totalSpent) * 100),
+    }));
+
+    res.json(summary);
+  } catch (err) {
+    console.error('Error generating spending summary:', err);
+    res.status(500).send('Error generating summary');
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

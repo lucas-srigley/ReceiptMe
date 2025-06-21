@@ -8,11 +8,11 @@ export async function handleReceiptUpload(file) {
   const imagePath = path.resolve(file.path);
   const imageData = fs.readFileSync(imagePath, { encoding: 'base64' });
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flas' });
 
-  const categories = 'Groceries, Dining and Takeout, Transportation, Housing/Rent, Travel,  Health & Wellness, Education, Clothes, Entertainment & Recreation, Charity & Giving, Miscellaneous';
+  const categories = 'Food & Dining, Entertainment, Shopping, Transportation, Other';
 
-  const prompt = `Extract the receipt data and return it as a JSON':
+  const prompt = `Extract the receipt data and return it in this JSON format:
   {
     "receiptId": "",
     "vendor": "",
@@ -39,9 +39,9 @@ export async function handleReceiptUpload(file) {
     },
   ]);
 
-
   const response = await result.response;
   const text = response.text();
+  console.log('api called');
 
   fs.unlinkSync(imagePath); // Delete temp file
 
