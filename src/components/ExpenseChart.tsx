@@ -1,20 +1,55 @@
+import React, { useEffect, useState } from 'react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from 'recharts';
 
-import React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+type Category = {
+  name: string;
+  amount: number;
+  color?: string;
+};
+
+const colorMap: Record<string, string> = {
+  'Food & Dining': '#10b981',
+  'Entertainment': '#3b82f6',
+  'Shopping': '#8b5cf6',
+  'Transportation': '#eab308',
+  'Other': '#6b7280',
+};
 
 const ExpenseChart = () => {
-  const data = [
-    { name: 'Food & Dining', value: 847.50, color: '#10b981' },
-    { name: 'Entertainment', value: 234.75, color: '#3b82f6' },
-    { name: 'Shopping', value: 456.30, color: '#8b5cf6' },
-    { name: 'Transportation', value: 189.25, color: '#eab308' },
-    { name: 'Other', value: 312.20, color: '#6b7280' }
-  ];
+  const [data, setData] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/spending-summary');
+        const json = await res.json();
+
+        const withColors = json.map((item: any) => ({
+          name: item.name,
+          value: item.amount,
+          color: colorMap[item.name] || '#9ca3af', // fallback gray
+        }));
+
+        setData(withColors);
+      } catch (error) {
+        console.error('Error fetching expense data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">Expense Breakdown</h2>
-      
+
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -25,6 +60,7 @@ const ExpenseChart = () => {
               outerRadius={100}
               dataKey="value"
               stroke="none"
+              nameKey="name"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
