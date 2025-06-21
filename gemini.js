@@ -1,48 +1,48 @@
-// gemini.js
 import fs from 'fs';
 import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-export async function runGemini() {
-  // Read and encode image file (change the path and type if needed)
-  const imagePath = path.resolve('./costco_receipt.jpg');  // your image file path
+export async function handleReceiptUpload(file) {
+  const imagePath = path.resolve(file.path);
   const imageData = fs.readFileSync(imagePath, { encoding: 'base64' });
 
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-  const receiptJSON = `{
+  const categories = 'Groceries, Dining and Takeout, Transportation, Housing/Rent, Travel,  Health & Wellness, Education, Clothes, Entertainment & Recreation, Charity & Giving, Miscellaneous';
+
+  const prompt = `Extract the receipt data and return it in this JSON format:
+  {
     "receiptId": "",
     "vendor": "",
     "date": "",
     "items": [
       {
         "itemId": "",
-        "itemName": "",
+        "name": "",
         "category": "",
         "price": ""
       }
-      // list other items if needed
     ]
-  }`;
-
-  const categories = 'Groceries, Dining and Takeout, Transportation, Housing/Rent, Travel,  Health & Wellness, Education, Clothes, Entertainment & Recreation, Charity & Giving, Miscellaneous';
+  } Generate random 32 bit id for receiptId and itemId. For category, choose one from here ` + categories;
 
   const result = await model.generateContent([
     {
       inlineData: {
-        mimeType: 'image/jpeg',  // or 'image/png'
+        mimeType: 'image/jpeg',
         data: imageData,
-      }
+      },
     },
     {
-      text: "For this receipt, extract into this JSON format:\n"
-      + receiptJSON + "\nFor categories, choose one from this list:\n"
-      + categories + "\nGenerate random 32 bit id for receiptId and itemId"
-    }
+      text: prompt,
+    },
   ]);
 
   const response = await result.response;
-  return response.text();
+  const text = response.text();
+
+  fs.unlinkSync(imagePath); // Delete temp file
+
+  return text;
 }

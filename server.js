@@ -1,18 +1,23 @@
 // server.js
-import 'dotenv/config';
 import express from 'express';
-import { runGemini } from './gemini.js';
+import multer from 'multer';
+import cors from 'cors';
+import 'dotenv/config';
+import { handleReceiptUpload } from './gemini.js';
 
 const app = express();
-const PORT = 3000;
+const upload = multer({ dest: 'uploads/' });
+const PORT = 3001;
 
-app.get('/', async (req, res) => {
+app.use(cors());
+
+app.post('/upload', upload.single('receipt'), async (req, res) => {
   try {
-    const geminiResponse = await runGemini();
-    res.send(`<h1>Gemini says:</h1><pre>${geminiResponse}</pre>`);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error processing Gemini request.');
+    const parsedText = await handleReceiptUpload(req.file);
+    res.json({ parsed: parsedText });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error processing receipt');
   }
 });
 
