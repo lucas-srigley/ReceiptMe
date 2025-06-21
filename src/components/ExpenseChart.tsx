@@ -16,14 +16,14 @@ type Category = {
 };
 
 const colorMap: Record<string, string> = {
-  'Groceries': 'bg-green-500',
-  'Dining & Takeout': 'bg-emerald-500',
-  'Entertainment': 'bg-blue-500',
-  'Shopping': 'bg-purple-500',
-  'Transportation': 'bg-yellow-500',
-  'Housing': 'bg-orange-500',
-  'Health & Wellness': 'bg-pink-500',
-  'Other': 'bg-gray-500',
+  'Groceries': '#10b981',          // green-500
+  'Dining & Takeout': '#34d399',   // emerald-400
+  'Entertainment': '#3b82f6',      // blue-500
+  'Shopping': '#8b5cf6',           // purple-500
+  'Transportation': '#eab308',     // yellow-500
+  'Housing': '#f97316',            // orange-500
+  'Health & Wellness': '#ec4899',  // pink-500
+  'Other': '#6b7280',  
 };
 
 const ExpenseChart = () => {
