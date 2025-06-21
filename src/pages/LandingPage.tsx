@@ -1,5 +1,6 @@
 import React from "react";
-import backgroundImage from "@/assets/background.png"; // <-- replace with your new image path
+import backgroundImage from "@/assets/background.png"; 
+import { GoogleLogin } from "@react-oauth/google"
 
 const LandingPage = () => {
   return (
@@ -16,9 +17,14 @@ const LandingPage = () => {
         <p className="text-lg md:text-xl text-blue-800 mb-8">
           Track your expenses smartly. Visualize spending. Let AI summarize receipts.
         </p>
-        <button className="px-6 py-3 rounded-full bg-blue-900 text-white font-medium hover:bg-blue-800 transition">
-          Sign up with Google
-        </button>
+        <>
+            <GoogleLogin 
+            onSuccess={(credentialResponse) => {
+                console.log(credentialResponse);
+            }} 
+            onError={ () => console.log("Login Failed")}/>
+        </>
+        
       </div>
     </div>
   );
