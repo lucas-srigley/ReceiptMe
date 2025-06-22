@@ -295,10 +295,18 @@ app.get("/api/users/:googleId", async (req, res) => {
 
 app.get('/api/ai-summary', async (req, res) => {
   try {
+    const { googleId } = req.query;
+    if (!googleId) return res.status(400).json({ error: "Missing googleId" });
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const receipts = await Receipt.find({ date: { $gte: thirtyDaysAgo } });
+    const receipts = await Receipt.find({
+      googleId,
+      date: { $gte: thirtyDaysAgo },
+    });
+
+    console.log(receipts)
 
     const categoryTotals = {};
 
