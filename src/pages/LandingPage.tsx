@@ -68,10 +68,9 @@ const LandingPage = () => {
     const savedUser = await response.json();
     console.log("User saved:", savedUser);
 
-    // ✅ Save full backend user to localStorage
+
     localStorage.setItem("user", JSON.stringify(savedUser));
 
-    // ✅ Navigate to dashboard
     navigate("/dashboard");
   } catch (error) {
     console.error("User saving error:", error);
