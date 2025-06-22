@@ -41,40 +41,42 @@ const LandingPage = () => {
                     shape="pill"
                     text="signin_with"
                     onSuccess={async (credentialResponse) => {
-                    if (!credentialResponse.credential) return;
+                      
+  if (!credentialResponse.credential) return;
 
-                    const decoded = jwtDecode(credentialResponse.credential) as any;
+  const decoded = jwtDecode(credentialResponse.credential) as any;
 
-                    const userData = {
-                        googleId: decoded.sub,
-                        email: decoded.email,
-                        firstName: decoded.given_name,
-                        lastName: decoded.family_name,
-                        picture: decoded.picture,
-                    };
-                    localStorage.setItem("user", JSON.stringify(userData));
-                    // navigate("/dashboard");
+  const userData = {
+    googleId: decoded.sub,
+    email: decoded.email,
+    firstName: decoded.given_name,
+    lastName: decoded.family_name,
+    picture: decoded.picture,
+  };
 
+  try {
+    const response = await fetch("http://localhost:3001/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
 
-                    try {
-                        const response = await fetch("http://localhost:3001/api/users", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(userData),
-                        });
+    if (!response.ok) throw new Error("Failed to store user");
 
-                        if (!response.ok) throw new Error("Failed to store user");
+    const savedUser = await response.json();
+    console.log("User saved:", savedUser);
 
-                        const savedUser = await response.json();
-                        console.log("User saved:", savedUser);
+    // ✅ Save full backend user to localStorage
+    localStorage.setItem("user", JSON.stringify(savedUser));
 
-                        navigate("/dashboard");
-                    } catch (error) {
-                        console.error("User saving error:", error);
-                    }
-                    }}
+    // ✅ Navigate to dashboard
+    navigate("/dashboard");
+  } catch (error) {
+    console.error("User saving error:", error);
+  }
+}}
                     onError={() => console.log("Login Failed")}
                 />
             </>

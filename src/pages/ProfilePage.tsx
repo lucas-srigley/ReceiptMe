@@ -1,30 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User } from 'lucide-react';
 
+const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+const googleId = loggedInUser?.googleId;
+
 const ProfilePage = () => {
   const [profile, setProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    age: '32',
-    gender: 'male',
-    ethnicity: 'hispanic',
-    maritalStatus: 'married',
-    children: '2',
-    income: '75000',
-    location: 'Waterloo, ON'
+    name: '',
+    email: '',
+    age: '',
+    gender: '',
+    ethnicity: '',
+    maritalStatus: '',
+    children: '',
+    income: '',
+    location: ''
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const googleId = loggedInUser?.googleId;
+      if (!googleId) return;
+
+      try {
+        const res = await fetch(`http://localhost:3001/api/users/${googleId}`);
+        const data = await res.json();
+        setProfile({
+          name: `${data.firstName} ${data.lastName}` || '',
+          email: data.email || '',
+          age: data.age || '',
+          gender: data.gender || '',
+          ethnicity: data.ethnicity || '',
+          maritalStatus: data.maritalStatus || '',
+          children: data.children?.toString() || '',
+          income: data.income?.toString() || '',
+          location: data.location || ''
+        });
+      } catch (err) {
+        console.error("Failed to load user profile", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    console.log('Profile saved:', profile);
-    // Handle save logic
-  };
+  const handleSave = async () => {
+  const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const googleId = loggedInUser?.googleId;
+
+  if (!googleId) {
+    console.error("User not logged in");
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:3001/api/users/${googleId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(profile),
+    });
+
+    if (!response.ok) throw new Error("Failed to save profile");
+    const updated = await response.json();
+
+    console.log("Profile saved:", updated);
+    alert("Profile updated successfully!");
+  } catch (error) {
+    console.error("Error saving profile:", error);
+    alert("Failed to save profile");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
