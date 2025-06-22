@@ -24,7 +24,6 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
 mongoose.connect('mongodb+srv://jamie:able2332@receiptme.jrijp23.mongodb.net/?retryWrites=true&w=majority&appName=receiptMe', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -34,8 +33,8 @@ mongoose.connect('mongodb+srv://jamie:able2332@receiptme.jrijp23.mongodb.net/?re
   console.error('MongoDB connection error:', err);
 });
 
-// Receipt Schema
 const receiptSchema = new mongoose.Schema({
+  googleId: { type: String, required: true },
   receiptId: String,
   vendor: String,
   date: {type: Date},
@@ -51,9 +50,12 @@ const Receipt = mongoose.model('Receipt', receiptSchema);
 
 app.post('/upload', upload.single('receipt'), async (req, res) => {
   try {
+    const googleId = req.body.googleId;
+    if (!googleId) return res.status(400).json({ error: "Missing googleId" });
 
     const receiptData = await handleReceiptUpload(req.file);
-    const receipt = new Receipt(receiptData);
+
+    const receipt = new Receipt({ ...receiptData, googleId });
     await receipt.save();
 
     res.json({ parsed: receiptData, saved: true });
@@ -65,12 +67,16 @@ app.post('/upload', upload.single('receipt'), async (req, res) => {
 
 app.get('/spending-summary', async (req, res) => {
   try {
+    const googleId = req.query.googleId; 
+    if (!googleId) return res.status(400).send("Missing googleId");
+
     const thirtyDaysAgo = new Date();
-    
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const receipts = await Receipt.find({ date: { $gte: thirtyDaysAgo } });
-
+    const receipts = await Receipt.find({
+      googleId,
+      date: { $gte: thirtyDaysAgo },
+    });
 
     const categoryTotals = {};
 
@@ -101,7 +107,10 @@ app.get('/spending-summary', async (req, res) => {
 
 app.get('/api/receipts', async (req, res) => {
   try {
-    const receipts = await Receipt.find();
+    const googleId = req.query.googleId; 
+    if (!googleId) return res.status(400).send("Missing googleId");
+
+    const receipts = await Receipt.find({ googleId });
     res.json(receipts);
   } catch (err) {
     console.error('Error fetching receipts:', err);
@@ -109,12 +118,13 @@ app.get('/api/receipts', async (req, res) => {
   }
 });
 
+
 app.post('/api/expenses', async (req, res) => {
   console.log('Incoming expense:', req.body);
   try {
-    const { vendor, items } = req.body;
+    const { vendor, items, googleId } = req.body;
 
-    if (!vendor || !items || !Array.isArray(items) || items.length === 0) {
+    if (!googleId || !vendor || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Invalid expense data' });
     }
 
@@ -123,6 +133,7 @@ app.post('/api/expenses', async (req, res) => {
     const receipt = new Receipt({
       receiptId,
       vendor,
+      googleId,
       date: new Date(),
       items: items.map((item, index) => ({
         itemId: Math.floor(Math.random() * 1e9).toString(),
