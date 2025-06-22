@@ -8,7 +8,7 @@ const colorMap: Record<string, string> = {
   'Transportation': 'bg-yellow-500',
   'Housing': 'bg-orange-500',
   'Health & Wellness': 'bg-pink-500',
-  'Other': 'bg-gray-500',
+  'Other (Type Category)': 'bg-gray-500',
 };
 
 type Category = {

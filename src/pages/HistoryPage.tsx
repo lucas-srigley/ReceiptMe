@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navigation from '@/components/Navigation';
-import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface Receipt {
@@ -26,7 +25,13 @@ const HistoryPage = () => {
       try {
         const res = await fetch('http://localhost:3001/api/receipts');
         const data = await res.json();
-        setReceipts(data);
+
+        // Sort receipts by newest date first
+        const sorted = data.sort(
+          (a: Receipt, b: Receipt) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        setReceipts(sorted);
       } catch (err) {
         console.error(err);
         setError('Failed to fetch receipts.');
@@ -65,7 +70,9 @@ const HistoryPage = () => {
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">{receipt.vendor}</h3>
                 <p className="text-sm text-gray-500">{new Date(receipt.date).toLocaleDateString()}</p>
-                <p className="text-2xl font-bold text-green-600 mt-2">${receipt.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-600 mt-2">
+                  ${receipt.items.reduce((sum, item) => sum + item.price, 0).toFixed(2)}
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -96,11 +103,17 @@ const HistoryPage = () => {
           ))}
         </div>
 
-        {receipts.length === 0 && (
+        {receipts.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">📄</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No receipts yet</h3>
             <p className="text-gray-500">Upload your first receipt to get started!</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-4 text-red-500 font-medium">
+            {error}
           </div>
         )}
       </div>

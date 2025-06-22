@@ -23,7 +23,7 @@ const colorMap: Record<string, string> = {
   'Transportation': '#eab308',     // yellow-500
   'Housing': '#f97316',            // orange-500
   'Health & Wellness': '#ec4899',  // pink-500
-  'Other': '#6b7280',  
+  'Other (Type Category)': '#6b7280',  
 };
 
 const ExpenseChart = () => {

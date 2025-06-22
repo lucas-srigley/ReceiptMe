@@ -31,7 +31,7 @@ const LandingPage = () => {
             </span>
         </h1>
         <p className="text-lg md:text-xl text-blue-800 mb-8">
-          Track your expenses smartly. Visualize spending. Let AI summarize receipts.
+          Track your expenses smartly. Visualize spending. <br /> Let AI summarize receipts.
         </p>
         <div className="flex justify-end">
             <>
