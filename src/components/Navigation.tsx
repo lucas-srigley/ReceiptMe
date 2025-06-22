@@ -1,12 +1,20 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, History, User } from 'lucide-react';
+import { googleLogout } from "@react-oauth/google";
 
 const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    googleLogout();
+    // localStorage.removeItem("user");
+    navigate("/");
+  };
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Dashboard' },
+    { path: '/dashboard', icon: Home, label: 'Dashboard' },
     { path: '/history', icon: History, label: 'History' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];
@@ -37,8 +45,10 @@ const Navigation = () => {
             ))}
           </div>
           
-          <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-            Logout
+          <button 
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+              Logout
           </button>
         </div>
       </div>
