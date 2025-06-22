@@ -43,7 +43,7 @@ const GeminiSummaryCard = () => {
               alt="Gemini"
               className="h-7 w-auto object-contain mt-[1px]" 
             />
-            <span className="text-xl font-semibold text-gray-800">AI Spending Insights</span>
+            <span className="text-xl font-semibold text-gray-800 flex mt-3">AI Spending Insights</span>
           </div>
           <Sparkles className="w-6 h-6 text-blue-500" />
         </CardTitle>
