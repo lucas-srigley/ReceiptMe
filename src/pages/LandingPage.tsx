@@ -21,44 +21,52 @@ const LandingPage = () => {
         <p className="text-lg md:text-xl text-blue-800 mb-8">
           Track your expenses smartly. Visualize spending. Let AI summarize receipts.
         </p>
-        <>
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              if (!credentialResponse.credential) return;
+        <div className="flex justify-end">
+            <>
+                <GoogleLogin
+                    theme="outline"
+                    size="large"
+                    shape="pill"
+                    text="signin_with"
+                    onSuccess={async (credentialResponse) => {
+                    if (!credentialResponse.credential) return;
 
-              const decoded = jwtDecode(credentialResponse.credential) as any;
+                    const decoded = jwtDecode(credentialResponse.credential) as any;
 
-              const userData = {
-                googleId: decoded.sub,
-                email: decoded.email,
-                firstName: decoded.given_name,
-                lastName: decoded.family_name,
-                picture: decoded.picture,
-              };
-              localStorage.setItem("user", JSON.stringify(userData));
+                    const userData = {
+                        googleId: decoded.sub,
+                        email: decoded.email,
+                        firstName: decoded.given_name,
+                        lastName: decoded.family_name,
+                        picture: decoded.picture,
+                    };
+                    localStorage.setItem("user", JSON.stringify(userData));
+                    // navigate("/dashboard");
 
-              try {
-                const response = await fetch("http://localhost:3001/api/users", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(userData),
-                });
 
-                if (!response.ok) throw new Error("Failed to store user");
+                    try {
+                        const response = await fetch("http://localhost:3001/api/users", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(userData),
+                        });
 
-                const savedUser = await response.json();
-                console.log("User saved:", savedUser);
+                        if (!response.ok) throw new Error("Failed to store user");
 
-                navigate("/dashboard");
-              } catch (error) {
-                console.error("User saving error:", error);
-              }
-            }}
-            onError={() => console.log("Login Failed")}
-          />
-        </>
+                        const savedUser = await response.json();
+                        console.log("User saved:", savedUser);
+
+                        navigate("/dashboard");
+                    } catch (error) {
+                        console.error("User saving error:", error);
+                    }
+                    }}
+                    onError={() => console.log("Login Failed")}
+                />
+            </>
+        </div>
       </div>
     </div>
   );
