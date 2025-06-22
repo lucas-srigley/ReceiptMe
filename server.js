@@ -4,6 +4,7 @@ import multer from 'multer';
 import cors from 'cors';
 import 'dotenv/config';
 import { handleReceiptUpload } from './gemini.js';
+import { generateAISpendingSummary } from './gemini.js';
 import mongoose from 'mongoose';
 
 const app = express();
@@ -278,5 +279,40 @@ app.get("/api/users/:googleId", async (req, res) => {
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get('/api/ai-summary', async (req, res) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const receipts = await Receipt.find({ date: { $gte: thirtyDaysAgo } });
+
+    const categoryTotals = {};
+
+    receipts.forEach(receipt => {
+      receipt.items.forEach(item => {
+        const category = item.category || 'Other (Type Category)';
+        if (!categoryTotals[category]) {
+          categoryTotals[category] = 0;
+        }
+        categoryTotals[category] += item.price;
+      });
+    });
+
+    const totalSpent = Object.values(categoryTotals).reduce((sum, val) => sum + val, 0);
+
+    const receiptSummary = Object.entries(categoryTotals).map(([name, amount]) => ({
+      name,
+      amount,
+      percentage: Math.round((amount / totalSpent) * 100),
+    }));
+
+    const summary = await generateAISpendingSummary(receiptSummary);
+    res.json({ summary });
+  } catch (err) {
+    console.error('Failed to generate AI summary:', err);
+    res.status(500).json({ error: 'Failed to generate AI summary' });
   }
 });

@@ -52,3 +52,20 @@ fs.unlinkSync(imagePath);
   return parsed;
 
 }
+
+export async function generateAISpendingSummary(receiptSummary) {
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const prompt = `Based on this JSON spending breakdown over the last 30 days, give a short AI-generated financial insight, trends, and advice:
+  
+  ${JSON.stringify(receiptSummary)}
+
+  Return only one paragraph of advice.`;
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+
+  console.log('Gemini called for spending summary');
+  return text;
+}
