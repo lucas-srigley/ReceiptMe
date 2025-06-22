@@ -3,6 +3,7 @@ import backgroundImage from "@/assets/background.png";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { Typewriter } from "react-simple-typewriter";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -16,7 +17,18 @@ const LandingPage = () => {
     >
       <div className="text-right max-w-xl mt-20 md:mt-0">
         <h1 className="text-5xl md:text-6xl font-bold text-blue-900 mb-6 drop-shadow-sm">
-          Welcome
+            Hi{' '}
+            <span className="text-blue-800">
+                <Typewriter
+                words={['Savings!', 'Money!', 'Budgeting!', 'Smart Spender!']}
+                loop={true}
+                cursor
+                cursorStyle="|"
+                typeSpeed={100}
+                deleteSpeed={50}
+                delaySpeed={1500}
+                />
+            </span>
         </h1>
         <p className="text-lg md:text-xl text-blue-800 mb-8">
           Track your expenses smartly. Visualize spending. Let AI summarize receipts.
