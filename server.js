@@ -76,7 +76,7 @@ app.get('/spending-summary', async (req, res) => {
 
     receipts.forEach(receipt => {
       receipt.items.forEach(item => {
-        const category = item.category || 'Other';
+        const category = item.category || 'Other (Type Category)';
         if (!categoryTotals[category]) {
           categoryTotals[category] = 0;
         }
@@ -127,7 +127,7 @@ app.post('/api/expenses', async (req, res) => {
       items: items.map((item, index) => ({
         itemId: Math.floor(Math.random() * 1e9).toString(),
         name: item.description || 'Unknown',
-        category: item.category || 'Other',
+        category: item.category || 'Other (Type Category)',
         price: parseFloat(item.amount) || 0,
       })),
     });
