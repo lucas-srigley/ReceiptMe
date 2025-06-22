@@ -168,71 +168,69 @@ app.put("/api/users/:googleId", async (req, res) => {
   }
 });
 
-app.get('/demographic-comparison', async (req, res) => {
-  try {
-    const scope = req.query.scope || 'global'; // 'global', 'country', 'city', 'age group'
-    const currentUserId = req.query.userId; // optionally passed from frontend
+app.get('/comparison-summary', async (req, res) => {
+  const googleId = req.query.googleId;
+  if (!googleId) return res.status(400).send("Missing googleId");
 
-    // Fetch current user's data (you may need user context)
-    const userReceipts = await Receipt.find({ userId: currentUserId, date: { $gte: lastMonth } });
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Aggregate all receipts matching the demographic scope
-    let filters = { date: { $gte: lastMonth } };
+  // --- Get current user's totals ---
+  const userReceipts = await Receipt.find({
+    googleId,
+    date: { $gte: thirtyDaysAgo },
+  });
 
-    if (scope === 'country') {
-      filters.country = 'Canada'; // You'll need user profile info
-    } else if (scope === 'city') {
-      filters.city = 'Toronto';
-    } else if (scope === 'age group') {
-      filters.ageGroup = '18-25';
-    }
-
-    const allReceipts = await Receipt.find(filters);
-
-    // Calculate averages
-    const categoryTotals = {};
-    const categoryCounts = {};
-
-    allReceipts.forEach((r) => {
-      r.items.forEach((item) => {
-        if (!categoryTotals[item.category]) {
-          categoryTotals[item.category] = 0;
-          categoryCounts[item.category] = 0;
-        }
-        categoryTotals[item.category] += item.price;
-        categoryCounts[item.category]++;
-      });
+  const userTotals = {};
+  userReceipts.forEach(receipt => {
+    receipt.items.forEach(item => {
+      const cat = item.category || 'Other (Type Category)';
+      userTotals[cat] = (userTotals[cat] || 0) + item.price;
     });
+  });
 
-    const avgByCategory = {};
-    for (const cat in categoryTotals) {
-      avgByCategory[cat] = categoryTotals[cat] / categoryCounts[cat];
-    }
+  // --- Get all users' totals ---
+  const allReceipts = await Receipt.find({ date: { $gte: thirtyDaysAgo } });
 
-    // Compare to current user's totals
-    const userCategoryTotals = {};
-    userReceipts.forEach((r) => {
-      r.items.forEach((item) => {
-        userCategoryTotals[item.category] = (userCategoryTotals[item.category] || 0) + item.price;
-      });
+  const allTotals = {};        // Total per category
+  const usersByCategory = {};  // Set of users per category
+
+  allReceipts.forEach(receipt => {
+    const uid = receipt.googleId;
+    receipt.items.forEach(item => {
+      const cat = item.category || 'Other (Type Category)';
+      allTotals[cat] = (allTotals[cat] || 0) + item.price;
+
+      if (!usersByCategory[cat]) usersByCategory[cat] = new Set();
+      usersByCategory[cat].add(uid);
     });
+  });
 
-    const comparison = Object.entries(avgByCategory).map(([category, avg]) => {
-      const userSpent = userCategoryTotals[category] || 0;
-      const difference = Math.round(((userSpent - avg) / avg) * 100);
-
-      return {
-        category,
-        difference,
-        isHigher: difference > 0
-      };
-    });
-
-    res.json(comparison);
-  } catch (err) {
-    console.error('Error generating demographic comparison:', err);
-    res.status(500).send('Error generating comparison');
+  const averages = {};
+  for (const cat in allTotals) {
+    averages[cat] = allTotals[cat] / usersByCategory[cat].size;
   }
+
+  // --- Compare user vs average ---
+  const comparison = [];
+
+  const allCategories = new Set([
+    ...Object.keys(userTotals),
+    ...Object.keys(averages)
+  ]);
+
+  allCategories.forEach(cat => {
+    const userSpent = userTotals[cat] || 0;
+    const avgSpent = averages[cat] || 0;
+    const diff = Math.round(userSpent - avgSpent);
+    comparison.push({
+      category: cat,
+      difference: Math.abs(diff),
+      isHigher: diff > 0
+    });
+  });
+
+  res.json(comparison);
 });
 
 const userSchema = new mongoose.Schema({
