@@ -39,7 +39,7 @@ const ComparisonCard = () => {
           <div key={comp.category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
             <span className="text-gray-700 font-medium">{comp.category}</span>
             <div className={`flex items-center space-x-1 ${comp.isHigher ? 'text-red-600' : 'text-green-600'}`}>
-              {comp.isHigher ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+              {comp.isHigher ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
               <span className="font-semibold">
                 {comp.isHigher ? '+' : '-'}${comp.difference}
               </span>
