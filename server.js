@@ -141,6 +141,21 @@ app.post('/api/expenses', async (req, res) => {
   }
 });
 
+app.put("/api/users/:googleId", async (req, res) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { googleId: req.params.googleId },
+      req.body,
+      { new: true }
+    );
+    if (!updatedUser) return res.status(404).send("User not found");
+    res.json(updatedUser);
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).send("Server error");
+  }
+});
+
 app.get('/demographic-comparison', async (req, res) => {
   try {
     const scope = req.query.scope || 'global'; // 'global', 'country', 'city', 'age group'
@@ -214,6 +229,13 @@ const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   picture: String,
+  age: Number,
+  gender: String,
+  ethnicity: String,
+  maritalStatus: String,
+  children: Number,
+  income: Number,
+  location: String,
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
@@ -239,4 +261,22 @@ app.post("/api/users", async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
+});
+
+// GET route to fetch a user by googleId
+app.get("/api/users/:googleId", async (req, res) => {
+  const { googleId } = req.params;
+
+  try {
+    const user = await User.findOne({ googleId });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
