@@ -134,7 +134,7 @@ const HistoryPage = () => {
                   {receipt.items.map((item, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <span className="text-gray-600 truncate mr-2">{item.name}</span>
-                      <span className="text-gray-900 font-medium">${item.price.toFixed(2)}</span>
+                      <span className="text-gray-900 font-medium">${Number(item.price || 0).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
