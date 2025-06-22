@@ -175,7 +175,6 @@ app.get('/comparison-summary', async (req, res) => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  // --- Get current user's totals ---
   const userReceipts = await Receipt.find({
     googleId,
     date: { $gte: thirtyDaysAgo },
@@ -189,11 +188,10 @@ app.get('/comparison-summary', async (req, res) => {
     });
   });
 
-  // --- Get all users' totals ---
   const allReceipts = await Receipt.find({ date: { $gte: thirtyDaysAgo } });
 
-  const allTotals = {};        // Total per category
-  const usersByCategory = {};  // Set of users per category
+  const allTotals = {};        
+  const usersByCategory = {}; 
 
   allReceipts.forEach(receipt => {
     const uid = receipt.googleId;
@@ -211,7 +209,6 @@ app.get('/comparison-summary', async (req, res) => {
     averages[cat] = allTotals[cat] / usersByCategory[cat].size;
   }
 
-  // --- Compare user vs average ---
   const comparison = [];
 
   const allCategories = new Set([
@@ -250,7 +247,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-// POST route in server.js
 app.post("/api/users", async (req, res) => {
   const { googleId, email, firstName, lastName, picture } = req.body;
 
@@ -273,7 +269,7 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-// GET route to fetch a user by googleId
+
 app.get("/api/users/:googleId", async (req, res) => {
   const { googleId } = req.params;
 
