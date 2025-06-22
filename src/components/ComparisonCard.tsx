@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
+
 const ComparisonCard = () => {
   const comparisons = [
     { category: 'Food & Dining', difference: 12, isHigher: true },

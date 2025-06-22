@@ -9,6 +9,9 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 
+const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+const googleId = loggedInUser?.googleId;
+
 const Spinner = () => (
   <div className="flex justify-center mt-4">
     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
@@ -80,6 +83,7 @@ const ExpenseInput = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          googleId,
           vendor,
           items: formattedExpenses,
         }),
@@ -104,6 +108,7 @@ const ExpenseInput = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append('receipt', file);
+    formData.append("googleId", googleId);
 
     try {
       const response = await fetch('http://localhost:3001/upload', {

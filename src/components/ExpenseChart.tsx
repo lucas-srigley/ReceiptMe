@@ -26,6 +26,9 @@ const colorMap: Record<string, string> = {
   'Other (Type Category)': '#6b7280',  
 };
 
+const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+const googleId = loggedInUser?.googleId;
+
 const ExpenseChart = () => {
   const [data, setData] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +36,7 @@ const ExpenseChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:3001/spending-summary');
+        const res = await fetch(`http://localhost:3001/spending-summary?googleId=${googleId}`);
         const json = await res.json();
 
         const withColors = json.map((item: any) => ({

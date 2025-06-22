@@ -9,6 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
+const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+const googleId = loggedInUser?.googleId;
+
 interface Receipt {
   _id: string;
   receiptId: string;
@@ -52,7 +55,7 @@ const HistoryPage = () => {
   useEffect(() => {
     const fetchReceipts = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/receipts');
+        const res = await fetch(`http://localhost:3001/api/receipts?googleId=${googleId}`);
         const data = await res.json();
         const sorted = sortReceipts(data, sortOption);
         setReceipts(sorted);

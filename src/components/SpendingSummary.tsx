@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
+const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+const googleId = loggedInUser?.googleId;
+
 const colorMap: Record<string, string> = {
   'Groceries': 'bg-green-500',
   'Dining & Takeout': 'bg-emerald-500',
@@ -25,7 +28,7 @@ const SpendingSummary = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:3001/spending-summary');
+        const res = await fetch(`http://localhost:3001/spending-summary?googleId=${googleId}`);
         const data: Category[] = await res.json();
 
         const total = data.reduce((sum, c) => sum + c.amount, 0);
