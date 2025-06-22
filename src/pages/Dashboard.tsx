@@ -10,6 +10,7 @@ import { User } from 'lucide-react';
 const Dashboard = () => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const firstName = user.firstName || "User";
+  const picture = user.picture || "User";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50">
@@ -23,9 +24,17 @@ const Dashboard = () => {
             </h1>
             <p className="text-gray-600">Here's your spending overview for December 2024</p>
           </div>
-          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
-            <User className="w-6 h-6 text-white" />
-          </div>
+          {picture !== 'User' ? (
+            <img
+              src={picture}
+              alt="User profile"
+              className="w-12 h-12 rounded-full object-cover border-2 border-green-500"
+            />) : (
+            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+          )}
+
         </div>
 
         <ExpenseInput />

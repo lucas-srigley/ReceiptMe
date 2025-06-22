@@ -17,7 +17,8 @@ const ProfilePage = () => {
     maritalStatus: '',
     children: '',
     income: '',
-    location: ''
+    location: '',
+    picture: '',
   });
 
   useEffect(() => {
@@ -38,7 +39,8 @@ const ProfilePage = () => {
           maritalStatus: data.maritalStatus || '',
           children: data.children?.toString() || '',
           income: data.income?.toString() || '',
-          location: data.location || ''
+          location: data.location || '',
+          picture: data.picture || '',
         });
       } catch (err) {
         console.error("Failed to load user profile", err);
@@ -53,33 +55,33 @@ const ProfilePage = () => {
   };
 
   const handleSave = async () => {
-  const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const googleId = loggedInUser?.googleId;
+    const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const googleId = loggedInUser?.googleId;
 
-  if (!googleId) {
-    console.error("User not logged in");
-    return;
-  }
+    if (!googleId) {
+      console.error("User not logged in");
+      return;
+    }
 
-  try {
-    const response = await fetch(`http://localhost:3001/api/users/${googleId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(profile),
-    });
+    try {
+      const response = await fetch(`http://localhost:3001/api/users/${googleId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profile),
+      });
 
-    if (!response.ok) throw new Error("Failed to save profile");
-    const updated = await response.json();
+      if (!response.ok) throw new Error("Failed to save profile");
+      const updated = await response.json();
 
-    console.log("Profile saved:", updated);
-    alert("Profile updated successfully!");
-  } catch (error) {
-    console.error("Error saving profile:", error);
-    alert("Failed to save profile");
-  }
-};
+      console.log("Profile saved:", updated);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50">
@@ -94,9 +96,17 @@ const ProfilePage = () => {
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* Profile Picture Section */}
           <div className="flex items-center space-x-4 mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
-              <User className="w-10 h-10 text-white" />
-            </div>
+            {profile.picture ? (
+              <img
+                src={profile.picture}
+                alt="User profile"
+                className="w-20 h-20 rounded-full object-cover border-2 border-green-500"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                <User className="w-10 h-10 text-white" />
+              </div>
+            )}
             <div>
               <h2 className="text-xl font-semibold text-gray-900">{profile.name}</h2>
               <p className="text-gray-600">{profile.email}</p>
