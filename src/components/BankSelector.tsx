@@ -1,6 +1,20 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import rbc from '@/assets/banks/RBC.png';
+import td from '@/assets/banks/TD.png';
+import scotiabank from '@/assets/banks/Scotiabank.png';
+import bmo from '@/assets/banks/BMO.png';
+import cibc from '@/assets/banks/CIBC.png';
+import national from '@/assets/banks/NationalBank.png';
+import hsbc from '@/assets/banks/HSBC.png';
+import cwb from '@/assets/banks/CanadianWestern.png';
+import eq from '@/assets/banks/EQ.png';
+import neo from '@/assets/banks/Neo.png';
+import citibank from '@/assets/banks/citibank.png';
+import manulife from '@/assets/banks/Manulife.png';
+import icici from '@/assets/banks/ICICI.png';
+
 
 interface BankSelectorProps {
   onConnect: (bankName: string) => void;
@@ -8,21 +22,21 @@ interface BankSelectorProps {
 }
 
 const BankSelector = ({ onConnect, onClose }: BankSelectorProps) => {
-  const canadianBanks = [
-    { name: 'Royal Bank of Canada (RBC)', logo: '🏛️', color: 'bg-blue-600' },
-    { name: 'Toronto-Dominion Bank (TD)', logo: '🏪', color: 'bg-green-600' },
-    { name: 'Bank of Nova Scotia (Scotiabank)', logo: '🏦', color: 'bg-red-600' },
-    { name: 'Bank of Montreal (BMO)', logo: '🏢', color: 'bg-blue-700' },
-    { name: 'Canadian Imperial Bank (CIBC)', logo: '🏛️', color: 'bg-red-700' },
-    { name: 'National Bank of Canada', logo: '🏪', color: 'bg-purple-600' },
-    { name: 'HSBC Bank Canada', logo: '🏦', color: 'bg-red-500' },
-    { name: 'Canadian Western Bank', logo: '🏢', color: 'bg-orange-600' },
-    { name: 'EQ Bank', logo: '💳', color: 'bg-teal-600' },
-    { name: 'Neo Financial', logo: '🚀', color: 'bg-indigo-600' },
-    { name: 'Citibank Canada', logo: '🏛️', color: 'bg-blue-500' },
-    { name: 'Manulife Bank', logo: '🏪', color: 'bg-green-700' },
-    { name: 'ICICI Bank Canada', logo: '🏦', color: 'bg-orange-500' }
-  ];
+    const canadianBanks = [
+        { name: 'Royal Bank of Canada (RBC)', image: rbc },
+        { name: 'Toronto-Dominion Bank (TD)', image: td },
+        { name: 'Bank of Nova Scotia (Scotiabank)', image: scotiabank },
+        { name: 'Bank of Montreal (BMO)', image: bmo },
+        { name: 'Canadian Imperial Bank (CIBC)', image: cibc },
+        { name: 'National Bank of Canada', image: national },
+        { name: 'HSBC Bank Canada', image: hsbc },
+        { name: 'Canadian Western Bank', image: cwb },
+        { name: 'EQ Bank', image: eq },
+        { name: 'Neo Financial', image: neo },
+        { name: 'Citibank Canada', image: citibank },
+        { name: 'Manulife Bank', image: manulife },
+        { name: 'ICICI Bank Canada', image: icici }
+    ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -49,8 +63,12 @@ const BankSelector = ({ onConnect, onClose }: BankSelectorProps) => {
               className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:shadow-md transition-all duration-200 text-left group"
             >
               <div className="flex items-center space-x-3">
-                <div className={`w-12 h-12 ${bank.color} rounded-lg flex items-center justify-center text-white text-xl`}>
-                  {bank.logo}
+                <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center bg-white border border-gray-200">
+                    <img
+                        src={bank.image}
+                        alt={bank.name}
+                        className="object-contain h-8 w-8"
+                    />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
