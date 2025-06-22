@@ -23,7 +23,7 @@ const categories = [
   'Transportation',
   'Housing',
   'Health & Wellness',
-  'Other',
+  'Other (Type Category)',
 ];
 
 type ExpenseRow = {
@@ -37,6 +37,7 @@ const ExpenseInput = () => {
   const [expenses, setExpenses] = useState<ExpenseRow[]>([
     { amount: '', category: '', description: '' },
   ]);
+  const [categoryEditable, setCategoryEditable] = useState<boolean[]>([false]);
   const [loading, setLoading] = useState(false);
   const [parsedReceipt, setParsedReceipt] = useState<string | null>(null);
 
@@ -46,8 +47,20 @@ const ExpenseInput = () => {
     setExpenses(updated);
   };
 
+  const setCategoryToOther = (index: number) => {
+    const updatedExpenses = [...expenses];
+    const updatedEditable = [...categoryEditable];
+
+    updatedExpenses[index].category = 'Other (Type Category)';
+    updatedEditable[index] = true;
+
+    setExpenses(updatedExpenses);
+    setCategoryEditable(updatedEditable);
+  };
+
   const addRow = () => {
     setExpenses([...expenses, { amount: '', category: '', description: '' }]);
+    setCategoryEditable([...categoryEditable, false]);
   };
 
   const handleManualEntry = async () => {
@@ -55,14 +68,14 @@ const ExpenseInput = () => {
       alert('Please enter a vendor and at least one expense item.');
       return;
     }
-  
+
     try {
       const formattedExpenses = expenses.map((item) => ({
         amount: item.amount,
         category: item.category,
         description: item.description,
       }));
-  
+
       const response = await fetch('http://localhost:3001/api/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,12 +84,13 @@ const ExpenseInput = () => {
           items: formattedExpenses,
         }),
       });
-  
+
       if (!response.ok) throw new Error('Failed to submit expense');
-  
+
       alert('Expense submitted successfully!');
       setVendor('');
       setExpenses([{ amount: '', category: '', description: '' }]);
+      setCategoryEditable([false]);
     } catch (error) {
       console.error('Error submitting manual expense:', error);
       alert('Something went wrong submitting the expense.');
@@ -135,23 +149,37 @@ const ExpenseInput = () => {
             value={expense.amount}
             onChange={(e) => handleRowChange(index, 'amount', e.target.value)}
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full justify-between">
-                {expense.category || 'Select Category'}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {categories.map((cat) => (
-                <DropdownMenuItem
-                  key={cat}
-                  onSelect={() => handleRowChange(index, 'category', cat)}
-                >
-                  {cat}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+
+          {categoryEditable[index] ? (
+            <Input
+              type="text"
+              placeholder="Enter category"
+              value={expense.category}
+              onChange={(e) => handleRowChange(index, 'category', e.target.value)}
+            />
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  {expense.category || 'Select Category'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {categories.map((cat) => (
+                  <DropdownMenuItem
+                    key={cat}
+                    onSelect={() =>
+                      cat === 'Other (Type Category)'
+                        ? setCategoryToOther(index)
+                        : handleRowChange(index, 'category', cat)
+                    }
+                  >
+                    {cat}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           <Input
             type="text"
