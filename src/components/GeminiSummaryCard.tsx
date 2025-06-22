@@ -15,7 +15,9 @@ const GeminiSummaryCard = () => {
     setSummary('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/ai-summary');
+      const loggedInUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const googleId = loggedInUser?.googleId;
+      const response = await fetch(`http://localhost:3001/api/ai-summary?googleId=${googleId}`);
       const data = await response.json();
 
       if (!response.ok || !data.summary) {
