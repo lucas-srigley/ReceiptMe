@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, History, User } from 'lucide-react';
+import { Home, History, User, CreditCard } from 'lucide-react';
 import { googleLogout } from "@react-oauth/google";
 import logo from '../assets/logo.png';
 
@@ -10,12 +10,12 @@ const Navigation = () => {
 
   const handleLogout = () => {
     googleLogout();
-    // localStorage.removeItem("user");
     navigate("/");
   };
 
   const navItems = [
     { path: '/dashboard', icon: Home, label: 'Dashboard' },
+    { path: '/banking', icon: CreditCard, label: 'Banking' },
     { path: '/history', icon: History, label: 'History' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];
@@ -29,7 +29,7 @@ const Navigation = () => {
             <img
               src={logo}
               alt="Logo"
-              className="w-7 h-7 rounded-lg" // import logo
+              className="w-7 h-7 rounded-lg" 
             />
 
             <span className="font-bold text-xl text-gray-800">ReceiptMe</span>
