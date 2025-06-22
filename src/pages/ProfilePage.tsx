@@ -14,7 +14,7 @@ const ProfilePage = () => {
     maritalStatus: 'married',
     children: '2',
     income: '75000',
-    location: 'Los Angeles, CA'
+    location: 'Waterloo, ON'
   });
 
   const handleInputChange = (field: string, value: string) => {
