@@ -24,12 +24,12 @@ const Navigation = () => {
     <nav className="bg-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-0">
+          <div className="flex items-center space-x-3">
 
             <img
               src={logo}
               alt="Logo"
-              className="w-20 h-20 rounded-lg" 
+              className="w-7 h-7 rounded-lg" 
             />
 
             <span className="font-bold text-xl text-gray-800">ReceiptMe</span>
