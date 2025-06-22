@@ -208,6 +208,35 @@ app.get('/demographic-comparison', async (req, res) => {
   }
 });
 
+const userSchema = new mongoose.Schema({
+  googleId: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
+  firstName: String,
+  lastName: String,
+  picture: String,
+}, { timestamps: true });
+
+const User = mongoose.model("User", userSchema);
+
+// POST route in server.js
+app.post("/api/users", async (req, res) => {
+  const { googleId, email, firstName, lastName, picture } = req.body;
+
+  try {
+    let user = await User.findOne({ googleId });
+
+    if (!user) {
+      user = new User({ googleId, email, firstName, lastName, picture });
+      await user.save();
+    }
+
+    res.status(201).json(user);
+  } catch (error) {
+    console.error("Error saving user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
