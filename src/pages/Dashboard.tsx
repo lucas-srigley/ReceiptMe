@@ -23,7 +23,7 @@ const Dashboard = () => {
             <h1 className="text-3xl font-bold text-gray-900">
               Welcome back, {firstName}!
             </h1>
-            <p className="text-gray-600">Here's your spending overview for December 2024</p>
+            <p className="text-gray-600">Here's your spending overview for June 2025</p>
           </div>
           {picture !== 'User' ? (
             <img
