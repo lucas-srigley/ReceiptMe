@@ -36,8 +36,6 @@ const LandingPage = () => {
                 picture: decoded.picture,
               };
               localStorage.setItem("user", JSON.stringify(userData));
-            // navigate("/dashboard");
-
 
               try {
                 const response = await fetch("http://localhost:3001/api/users", {

@@ -63,10 +63,12 @@ const ExpenseInput = () => {
         description: item.description,
       }));
   
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
       const response = await fetch('http://localhost:3001/api/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          googleId: user.googleId,
           vendor,
           items: formattedExpenses,
         }),
