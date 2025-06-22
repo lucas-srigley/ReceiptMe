@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, History, User } from 'lucide-react';
 import { googleLogout } from "@react-oauth/google";
+import logo from '../assets/logo.png';
 
 const Navigation = () => {
   const location = useLocation();
@@ -23,8 +24,14 @@ const Navigation = () => {
     <nav className="bg-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg"></div>
+          <div className="flex items-center space-x-0">
+
+            <img
+              src={logo}
+              alt="Logo"
+              className="w-20 h-20 rounded-lg" // import logo
+            />
+
             <span className="font-bold text-xl text-gray-800">ReceiptMe</span>
           </div>
           
