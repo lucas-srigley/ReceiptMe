@@ -10,7 +10,7 @@ export async function handleReceiptUpload(file) {
 
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-  const categories = 'Groceries, Dining & Takeout, Entertainment, Shopping, Transportation, Housing, Health & Wellness, Other';
+  const categories = 'Groceries, Dining & Takeout, Entertainment, Shopping, Transportation, Housing, Health & Wellness, Other (Type Category)';
 
   const prompt = `Extract the receipt data and return it in this JSON format:
   {
