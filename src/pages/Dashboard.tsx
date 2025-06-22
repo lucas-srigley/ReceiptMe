@@ -5,6 +5,7 @@ import ExpenseInput from '@/components/ExpenseInput';
 import SpendingSummary from '@/components/SpendingSummary';
 import ExpenseChart from '@/components/ExpenseChart';
 import ComparisonCard from '@/components/ComparisonCard';
+import GeminiSummaryCard from '@/components/GeminiSummaryCard';
 import { User } from 'lucide-react';
 
 const Dashboard = () => {
@@ -42,6 +43,11 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <SpendingSummary />
           <ExpenseChart />
+        </div>
+
+        {/* Gemini AI Summary */}
+        <div className="mb-6">
+          <GeminiSummaryCard />
         </div>
 
         <ComparisonCard />
