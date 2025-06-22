@@ -36,7 +36,6 @@ mongoose.connect('mongodb+srv://jamie:able2332@receiptme.jrijp23.mongodb.net/?re
 
 // Receipt Schema
 const receiptSchema = new mongoose.Schema({
-  googleId: { type: String, required: true },
   receiptId: String,
   vendor: String,
   date: {type: Date},
@@ -101,12 +100,8 @@ app.get('/spending-summary', async (req, res) => {
 });
 
 app.get('/api/receipts', async (req, res) => {
-  const googleId = req.query.googleId; // pass as query param from frontend
-
-  if (!googleId) return res.status(400).json({ error: "Missing user ID" });
-
   try {
-    const receipts = await Receipt.find({ googleId });
+    const receipts = await Receipt.find();
     res.json(receipts);
   } catch (err) {
     console.error('Error fetching receipts:', err);
@@ -115,8 +110,9 @@ app.get('/api/receipts', async (req, res) => {
 });
 
 app.post('/api/expenses', async (req, res) => {
+  console.log('Incoming expense:', req.body);
   try {
-    const { googleId, vendor, items } = req.body;
+    const { vendor, items } = req.body;
 
     if (!vendor || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Invalid expense data' });
@@ -125,7 +121,6 @@ app.post('/api/expenses', async (req, res) => {
     const receiptId = Math.floor(Math.random() * 1e9).toString(); // generate random receipt ID
 
     const receipt = new Receipt({
-      googleId,
       receiptId,
       vendor,
       date: new Date(),
