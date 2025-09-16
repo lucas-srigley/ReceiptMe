@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -23,3 +24,10 @@ dist-ssr
 *.sln
 *.sw?
 .env
+=======
+node_modules
+package-lock.json
+.DS_Store
+.env
+uploads
+>>>>>>> ReceiptMe-backend/main
